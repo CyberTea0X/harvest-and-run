@@ -13,7 +13,7 @@ type Order struct {
 	// What to do
 	Command int
 	// Where to go, where to build, where to attack etc
-	Position math.Position
+	Position math.Vec2
 	// source unit id
 	SourceUnit int
 	Completed  bool

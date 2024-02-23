@@ -2,6 +2,7 @@ package main
 
 import (
 	"harvest-and-run/math"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -11,14 +12,24 @@ type Game struct {
 	Player        *Player
 	MaxUnitId     int
 	units         []*Unit
+	lastUpdate    time.Time
+}
+
+// Returns amount of time passed since last update
+func (g *Game) Dt() time.Duration {
+	dt := time.Since(g.lastUpdate)
+	if dt.Milliseconds() == 0 {
+		return time.Duration(time.Millisecond * time.Duration(1000/ebiten.TPS()))
+	}
+	return dt
 }
 
 // Adds new unit to the game.
 //
-// returns unit unique identifier
-func (g *Game) AddUnit(unit *Unit) int {
-	g.units = append(g.units, unit)
-	return len(g.units) - 1
+// Generates and sets unit unique ID
+func (g *Game) AddUnit(u *Unit) {
+	g.units = append(g.units, u)
+	u.Id = len(g.units) - 1
 }
 
 func (g *Game) GetUnit(id int) *Unit {
@@ -36,12 +47,13 @@ func (g *Game) Update() error {
 			o.OrderGroup = og
 			o.Command = CommandMove
 			o.SourceUnit = uId
-			o.Position = math.NewPosition(ebiten.CursorPosition())
+			o.Position = math.Vec2From(ebiten.CursorPosition())
 		}
 	}
 	for _, u := range g.units {
 		u.Update(g)
 	}
+	g.lastUpdate = time.Now()
 	return nil
 }
 
@@ -49,9 +61,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, unit := range g.units {
 		unit.Draw(screen)
 	}
-}
-
-func (g *Game) ProcessCommands(p *Player) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
