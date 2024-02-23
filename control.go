@@ -1,5 +1,7 @@
 package main
 
+import "harvest-and-run/math"
+
 const (
 	CommandMove int = iota
 )
@@ -11,7 +13,7 @@ type Order struct {
 	// What to do
 	Command int
 	// Where to go, where to build, where to attack etc
-	Position Position
+	Position math.Position
 	// source unit id
 	SourceUnit int
 	Completed  bool

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"harvest-and-run/math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -25,7 +26,7 @@ func main() {
 	x = x / 2
 	y = y / 2
 	fmt.Println(x, y)
-	drone.Position = Position{x, y}
+	drone.Position = math.Position{x, y}
 	droneId := game.AddUnit(drone)
 	player.Selection.Add(droneId)
 	game.Player = player

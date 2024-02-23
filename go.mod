@@ -2,7 +2,10 @@ module harvest-and-run
 
 go 1.21.6
 
-require github.com/hajimehoshi/ebiten/v2 v2.6.6
+require (
+	github.com/hajimehoshi/ebiten/v2 v2.6.6
+	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225
+)
 
 require (
 	github.com/ebitengine/purego v0.6.0 // indirect

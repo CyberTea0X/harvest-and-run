@@ -1,11 +1,14 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"harvest-and-run/math"
+)
 
 type Unit struct {
 	Image            *ebiten.Image
 	Name             string
-	Position         Position
+	Position         math.Position
 	orders           []*Order
 	MaxSpeed         int
 	CurrentSpeed     float64
@@ -39,8 +42,8 @@ func (u *Unit) CancelOrder() {
 
 func (u *Unit) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	x := float64(u.Position.X - u.Image.Bounds().Dx()/2)
-	y := float64(u.Position.Y - u.Image.Bounds().Dy()/2)
+	x := float64(u.Position[0] - u.Image.Bounds().Dx()/2)
+	y := float64(u.Position[1] - u.Image.Bounds().Dy()/2)
 	op.GeoM.Translate(x, y)
 	screen.DrawImage(u.Image, op)
 }
@@ -49,9 +52,10 @@ func (u *Unit) CanMove() bool {
 	return u.MaxSpeed > 0 && u.LineAcceleration > 0
 }
 
-func (u *Unit) Move(pos Position) {
+func (u *Unit) MoveTo(x int, y int) {
 	u.CurrentSpeed += float64(u.LineAcceleration)
-	u.Position = pos
+	u.Position[0] = x
+	u.Position[1] = y
 }
 
 func (u *Unit) ProcessOrders(g *Game) {
@@ -61,12 +65,14 @@ func (u *Unit) ProcessOrders(g *Game) {
 	}
 	switch o.Command {
 	case CommandMove:
-		if !u.CanMove() || Distance(u.Position, o.Position) <= 1 {
+		pos1 := u.Position
+		pos2 := o.Position
+		if !u.CanMove() || math.Distance(pos1[0], pos2[0], pos1[1], pos2[1]) <= 1 {
 			u.CurrentSpeed = 0
 			u.FinishOrder()
 			return
 		}
-		u.Move(o.Position)
+		u.MoveTo(o.Position[0], o.Position[1])
 	}
 }
 

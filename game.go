@@ -1,6 +1,10 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"harvest-and-run/math"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type Game struct {
 	RemotePlayers []*Player
@@ -32,7 +36,7 @@ func (g *Game) Update() error {
 			o.OrderGroup = og
 			o.Command = CommandMove
 			o.SourceUnit = uId
-			o.Position = NewPosition(ebiten.CursorPosition())
+			o.Position = math.NewPosition(ebiten.CursorPosition())
 		}
 	}
 	for _, u := range g.units {
