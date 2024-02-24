@@ -1,4 +1,4 @@
-package main
+package control
 
 import "harvest-and-run/math"
 

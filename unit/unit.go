@@ -1,12 +1,13 @@
-package main
+package unit
 
 import (
 	"fmt"
+	"harvest-and-run/control"
+	"harvest-and-run/errors"
 	"harvest-and-run/math"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Unit struct {
@@ -14,20 +15,20 @@ type Unit struct {
 	Image            *ebiten.Image
 	Name             string
 	Position         math.Vec2
-	orders           []*Order
+	orders           []*control.Order
 	MaxSpeed         float32
 	CurrentSpeed     float32
 	LineAcceleration float32
 	// Angle
 }
 
-func (u *Unit) Order(o *Order) {
+func (u *Unit) Order(o *control.Order) {
 	u.orders = append(u.orders, o)
 }
 
-func (u *Unit) CurrentOrder() (*Order, error) {
+func (u *Unit) CurrentOrder() (*control.Order, error) {
 	if len(u.orders) == 0 {
-		return nil, ErrNoOrder
+		return nil, errors.ErrNoOrder
 	}
 	return u.orders[0], nil
 }
@@ -66,6 +67,24 @@ func (u *Unit) Accelerate() {
 	}
 }
 
+func (u *Unit) ProcessOrders(dt time.Duration) {
+	o, err := u.CurrentOrder()
+	if err != nil {
+		return
+	}
+	switch o.Command {
+	case control.CommandMove:
+		pos1 := u.Position
+		pos2 := o.Position
+		if !u.CanMove() || math.Distance(pos1[0], pos1[1], pos2[0], pos2[1]) <= 1 {
+			u.CurrentSpeed = 0
+			u.FinishOrder()
+			return
+		}
+		u.MoveTo(int(o.Position[0]), int(o.Position[1]), dt)
+	}
+}
+
 func (u *Unit) MoveTo(x int, y int, dt time.Duration) {
 	u.Accelerate()
 	target := math.Vec2From(x, y)
@@ -82,38 +101,6 @@ func (u *Unit) MoveTo(x int, y int, dt time.Duration) {
 	u.Position = nextPos
 }
 
-func (u *Unit) ProcessOrders(g *Game) {
-	o, err := u.CurrentOrder()
-	if err != nil {
-		return
-	}
-	switch o.Command {
-	case CommandMove:
-		pos1 := u.Position
-		pos2 := o.Position
-		if !u.CanMove() || math.Distance(pos1[0], pos1[1], pos2[0], pos2[1]) <= 1 {
-			u.CurrentSpeed = 0
-			u.FinishOrder()
-			return
-		}
-		u.MoveTo(int(o.Position[0]), int(o.Position[1]), g.Dt())
-	}
-}
-
-func (u *Unit) Update(g *Game) {
-	u.ProcessOrders(g)
-}
-
-// Creates Drone Unit
-func NewDrone(x, y int) *Unit {
-	drone := new(Unit)
-	drone.Position = math.Vec2From(x, y)
-	img, _, err := ebitenutil.NewImageFromFile("./images/flying_bot.png")
-	if err != nil {
-		panic(err)
-	}
-	drone.Image = img
-	drone.MaxSpeed = 2.0
-	drone.LineAcceleration = 0.1
-	return drone
+func (u *Unit) Update(dt time.Duration) {
+	u.ProcessOrders(dt)
 }

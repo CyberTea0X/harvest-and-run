@@ -1,4 +1,4 @@
-package main
+package errors
 
 type ConstantError string
 
@@ -8,4 +8,3 @@ func (e ConstantError) Error() string { return string(e) }
 const (
 	ErrNoOrder = ConstantError("Unit has no order")
 )
-
