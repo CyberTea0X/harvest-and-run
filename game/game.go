@@ -3,9 +3,9 @@ package game
 import (
 	"harvest-and-run/assets"
 	"harvest-and-run/control"
+	"harvest-and-run/event"
 	"harvest-and-run/math"
 	"harvest-and-run/player"
-	"harvest-and-run/ui"
 	"harvest-and-run/unit"
 	"time"
 
@@ -19,7 +19,15 @@ type Game struct {
 	MaxUnitId     int
 	units         []*unit.Unit
 	lastUpdate    time.Time
-	Ui            *ui.GameUI
+	Events        []*event.Event
+}
+
+// Creates new game with no nil fields (either default or set from arguments)
+func New(assets *assets.Assets, player *player.Player) *Game {
+	game := new(Game)
+	game.Assets = assets
+	game.Player = player
+	return game
 }
 
 // Returns amount of time passed since last update
@@ -44,7 +52,6 @@ func (g *Game) GetUnit(id int) *unit.Unit {
 }
 
 func (g *Game) Update() error {
-	g.Ui.Update()
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 		og := []*control.Order{}
 		for _, uId := range g.Player.Selection.Units {
@@ -66,7 +73,6 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.Ui.Draw(screen)
 	for _, unit := range g.units {
 		unit.Draw(screen)
 	}

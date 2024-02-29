@@ -21,7 +21,7 @@ type Assets struct {
 	fontsPath   string
 }
 
-func SetupDefault() *Assets {
+func New() *Assets {
 	a := new(Assets)
 	a.imageAssets = make(map[string]*ebiten.Image)
 	a.fontAssets = make(map[string]*truetype.Font)

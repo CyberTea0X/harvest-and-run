@@ -1,0 +1,6 @@
+[client]
+server_ip = "localhost"
+server_port = 8080
+
+[host]
+port = 8080
